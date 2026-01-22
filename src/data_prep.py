@@ -170,8 +170,9 @@ total_df = merge_datasets(
 
 final_df = select_final_columns(total_df)
 
+path = os.path.join(root_path, "project1")
 save_dataframe(
     final_df,
-    root_path=data_path,
+    root_path=path,
     filename="final_df.csv"
 )

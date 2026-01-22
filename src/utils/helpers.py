@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
+import pandas as pd
 
 def set_korean_font():
     """
@@ -32,3 +33,32 @@ def save_fig(fig_id, tight_layout=True, fig_extension="png", resolution=300):
         plt.tight_layout()
     plt.savefig(path, format=fig_extension, dpi=resolution)
     
+    
+def load_and_cast_final_df(path: str) -> pd.DataFrame:
+    """
+    최종 저장된 CSV를 불러와
+    분석에 필요한 datatype(datetime, timedelta)으로 변환합니다.
+    """
+    df = pd.read_csv(path)
+
+    # datetime 컬럼
+    datetime_cols = [
+        'order_delivered_carrier_date',
+        'order_delivered_customer_date',
+        'order_estimated_delivery_date',
+        'order_purchase_timestamp'
+    ]
+
+    for col in datetime_cols:
+        df[col] = pd.to_datetime(df[col], errors='coerce')
+
+    # timedelta 컬럼
+    timedelta_cols = [
+        'total_delivery_time',
+        'delay_days'
+    ]
+
+    for col in timedelta_cols:
+        df[col] = pd.to_timedelta(df[col], errors='coerce')
+
+    return df
