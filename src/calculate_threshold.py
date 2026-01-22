@@ -75,12 +75,12 @@ final_df['handling_time'] = (final_df['order_delivered_carrier_date'] - final_df
 final_df['pure_transit_time'] = (final_df['order_delivered_customer_date'] - final_df['order_delivered_carrier_date']).dt.total_seconds() / (24 * 3600)
 
 # 2. 경로별 동적 임계값 산출 로직
-route_transit_avg = final_df.groupby('route')['pure_transit_time'].mean()
+route_transit_avg = final_df.groupby('route')['handling_time'].mean()
 global_transit_avg = final_df['pure_transit_time'].mean()
 
 def get_dynamic_threshold(route):
     avg_transit = route_transit_avg.get(route, global_transit_avg)
-    threshold = 20 - avg_transit
+    threshold = avg_transit
     return max(0.5, threshold)
 
 final_df['dynamic_threshold'] = final_df['route'].apply(get_dynamic_threshold)
@@ -109,4 +109,38 @@ plt.ylabel('Actual Result')
 
 helpers.save_figure("경로별 동적 임계값 성능 지표.png")
 
+plt.show()
+
+# 경로별 평균 운송시간 + 동적 임계값 정리
+route_threshold_df = (
+    final_df[['route', 'dynamic_threshold', 'handling_time']]
+    .groupby('route')
+    .agg(
+        avg_transit_time=('handling_time', 'mean'),
+        dynamic_threshold=('dynamic_threshold', 'mean'),
+        count=('route', 'count')
+    )
+    .reset_index()
+    .sort_values('dynamic_threshold')
+)
+
+print("--- 경로별 동적 임계값 요약 ---")
+print(route_threshold_df.tail(20))   # 상위 20개만 보고 싶을 때
+
+top_routes = (
+    route_threshold_df
+    .sort_values('count', ascending=False)
+    .head(20)
+    .sort_values('dynamic_threshold')  # threshold 기준 정렬
+)
+
+# 그래프
+plt.figure(figsize=(10, 6))
+plt.barh(top_routes['route'], top_routes['dynamic_threshold'])
+plt.xlabel('Dynamic Threshold (Days)')
+plt.ylabel('Route (Seller → Customer)')
+plt.title('Dynamic Handling-Time Threshold by Route (Top 20 Routes)')
+plt.gca().invert_yaxis()
+plt.tight_layout()
+helpers.save_figure("지역별 임계값.png")
 plt.show()
