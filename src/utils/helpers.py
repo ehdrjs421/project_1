@@ -62,3 +62,10 @@ def load_and_cast_final_df(path: str) -> pd.DataFrame:
         df[col] = pd.to_timedelta(df[col], errors='coerce')
 
     return df
+
+def save_figure(fig_name: str):
+    import os
+    
+    root_path = os.path.abspath(os.path.join(os.getcwd(), '..'))
+    path = os.path.join(root_path, "project1", "reports", "figures", fig_name)
+    plt.savefig(path, dpi=300, bbox_inches="tight")
