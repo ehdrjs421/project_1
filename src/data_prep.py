@@ -176,3 +176,5 @@ save_dataframe(
     root_path=path,
     filename="final_df.csv"
 )
+
+# 영어 카테고리명 추가
