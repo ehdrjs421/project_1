@@ -2,11 +2,10 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import koreanize_matplotlib
-
+from utils import helpers
 
 from google.colab import drive
 drive.mount('/content/drive')
-
 
 ## ==============================
 ## 데이터 불러오기
@@ -82,7 +81,7 @@ plt.xlabel('Days')
 plt.ylabel('Count')
 plt.title('Distribution of Delivery Days')
 plt.legend()
-plt.show()
+plt.show() # 이미지 save 필요x
 # => 전체 데이터를 봤을 때, 배송 예상 소요일의 분포는 2~3주
 
 
@@ -102,7 +101,7 @@ plt.xlabel('Days')
 plt.ylabel('Count')
 plt.title('Distribution of Delivery Days')
 plt.legend()
-plt.show()
+plt.show() # 이미지 save 필요x
 # => 배송 기간이 20일 이상이었던 경우, 대부분의 사람들이 배송 예정 기간을 20~40일 사이로 안내 받음
 
 
@@ -132,12 +131,14 @@ colors_Y = [color_map[int(i)] for i in review_ratio_Y.index]
 plt.figure()
 plt.pie(review_ratio_Y.values, labels=review_ratio_Y.index.astype(int), autopct='%.1f%%', startangle=90, colors=colors_Y)
 plt.title('리뷰 별점 분포 (예정 배송 소요일 > 20)')
+helpers.save_figure("리뷰 별점 분포 (예정 배송 소요일 > 20.png")
 plt.show()
 
 colors_N = [color_map[int(i)] for i in review_ratio_N.index]
 plt.figure()
 plt.pie(review_ratio_N.values, labels=review_ratio_N.index.astype(int), autopct='%.1f%%', startangle=90, colors=colors_N)
 plt.title('리뷰 별점 분포 (예정 배송 소요일 <= 20)')
+helpers.save_figure("리뷰 별점 분포 (예정 배송 소요일 <= 20.png")
 plt.show()
 # => 배송이 20일 이상 걸리더라도, 사전에 공지가 된다면 만족도를 개선할 수 있을 것.
 
@@ -161,8 +162,10 @@ plt.xlabel('Date Difference')
 plt.ylabel('Review Rate')
 plt.title('예상배송일과 실제배송일 차이에 따른 고객 만족도 ')
 plt.legend()
+helpers.save_figure("예상배송일과 실제배송일 차이에 따른 고객 만족도.png")
 plt.show()
 
-# 각 평균값 
+# 각 평균값
+diff = del_diff_review_mean.reset_index() 
 diff[(diff['del_diff']>=-30) & (diff['del_diff']<0)]['review_score'].mean()
 diff[(diff['del_diff']>0) & (diff['del_diff']<=30)]['review_score'].mean()
