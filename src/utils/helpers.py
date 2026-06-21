@@ -1,6 +1,9 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
+from pathlib import Path
+
+PROJECT_ROOT = Path.cwd().parents[0] 
 
 def set_korean_font():
     """
@@ -28,7 +31,13 @@ def save_fig(fig_id, tight_layout=True, fig_extension="png", resolution=300):
     reports/figures 폴더에 그래프를 저장합니다.
     """
     from pathlib import Path
-    path = Path("reports") / "figures" / f"{fig_id}.{fig_extension}"
+    # Determine project root relative to this file (src/utils/helpers.py)
+    root_path = Path(__file__).resolve().parent.parent.parent
+    path = root_path / "reports" / "figures" / f"{fig_id}.{fig_extension}"
+    
+    # Ensure directory exists
+    path.parent.mkdir(parents=True, exist_ok=True)
+
     if tight_layout:
         plt.tight_layout()
     plt.savefig(path, format=fig_extension, dpi=resolution)
@@ -63,9 +72,7 @@ def load_and_cast_final_df(path: str) -> pd.DataFrame:
 
     return df
 
-def save_figure(fig_name: str):
-    import os
-    
-    root_path = os.path.abspath(os.path.join(os.getcwd(), '..'))
-    path = os.path.join(root_path, "project1", "reports", "figures", fig_name)
-    plt.savefig(path, dpi=300, bbox_inches="tight")
+def save_figure(fig_name: str, dpi: int = 300):
+    path = PROJECT_ROOT / "reports" / "figures" / fig_name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    plt.savefig(path, dpi=dpi, bbox_inches="tight")
